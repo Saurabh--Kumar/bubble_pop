@@ -42,11 +42,21 @@ def draw_objects(frame, objects):
         position = obj["position"]
         size = obj["size"]
         color = obj["color"]
-        
+        alpha_value = 0.05
+
+        # Create a blank image with the same dimensions as the frame
+
+        # Draw the shapes on the overlay image
         if obj["shape"] == "circle":
-            cv2.circle(frame, position, size, color, -1)
-        elif obj["shape"] == "square":
+            cv2.circle(frame, position, size, color, 2)
+        elif obj["shape"] == "triangle":
+            points = np.array([position,
+                               (position[0] - size, position[1] + size),
+                               (position[0] + size, position[1] + size)], np.int32)
+            cv2.polylines(frame, [points], isClosed=True, color=color, thickness=2)
+
+        # Blend the overlay with the original frame
+        '''elif obj["shape"] == "square":
             top_left = (position[0] - size, position[1] - size)
             bottom_right = (position[0] + size, position[1] + size)
-            cv2.rectangle(frame, top_left, bottom_right, color, -1)
-        # More shapes can be added as needed
+            cv2.rectangle(frame, top_left, bottom_right, color, -1)'''

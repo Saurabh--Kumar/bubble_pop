@@ -16,7 +16,7 @@ def update_objects_and_collisions(objects, fists, speed, frame_height, health_de
             continue  # Object is "hit" and disappears
 
         if object_fell_through(updated_obj, frame_height):
-            health -= health_decrement
+                health -= health_decrement
         else:
             new_objects.append(updated_obj)
 
@@ -108,6 +108,7 @@ def game_loop():
     screen_width, screen_height = get_screen_resolution()
     cap = setup_camera(screen_width, screen_height)
     hands = setup_hand_detection()
+    objects, score, health = initialize_game_state(screen_width)
     if not objects:
         objects = [generate_object(screen_width, objects)]
     speed = 7
@@ -122,7 +123,6 @@ def game_loop():
         while cap.isOpened():
             success, frame = cap.read()
             if not success:
-                logging.warning("Failed to read frame.")
                 break
 
             frame = cv2.flip(frame, 1)
@@ -134,10 +134,11 @@ def game_loop():
             )
 
             if not objects:
-                objects, score, health = initialize_game_state(screen_width)
-                break
+                objects = [generate_object(screen_width, []) for _ in range(5)]
 
             display_game_status(frame, score, health)
+
+            draw_objects(frame, objects)
 
             if check_game_over(frame, health):
                 frame_height, frame_width = frame.shape[:2]
