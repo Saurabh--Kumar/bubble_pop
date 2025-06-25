@@ -44,7 +44,7 @@ class GameEngine:
         from events.observers.spawner_observer import SpawnerObserver
         from events.observers.freeze_observer import FreezeObserver
         
-        self.event_manager.register_observer(EventType.BUBBLE_HIT, ScoreObserver())
+        self.event_manager.register_observer(EventType.BUBBLE_HIT, ScoreObserver(self))
         self.event_manager.register_observer(EventType.BUBBLE_HIT, SoundObserver())
         self.event_manager.register_observer(EventType.BUBBLE_MISSED, HealthObserver())
         self.event_manager.register_observer(EventType.BUBBLE_HIT, SpawnerObserver(self.object_manager))
