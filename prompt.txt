@@ -1,0 +1,395 @@
+You are a powerful coding AI. Please generate a clean, extensible, SOLID-compliant, event-driven Python implementation of a game called bubble_pop. It uses MediaPipe for hand tracking and OpenCV for rendering and video capture.
+
+🎮 Game Overview
+The game uses the front camera to track a user’s fists (center point). Bubbles fall from the top of the screen. The user pops them by touching them with their fist.
+
+Core Rules:
+Each pop = +1 score and new bubble
+
+Missed bubble = -10% health (configurable)
+
+Powers like F, D, and H fall and can be collected
+
+Game ends when health reaches 0
+
+Game starts after 10s countdown
+
+📦 Required Features
+Frame-by-frame video rendering with OpenCV
+
+Fist tracking using MediaPipe (track both hands identically)
+
+Bubble and power object management
+
+Health bar and score overlay
+
+Object hit detection (configurable frame interval)
+
+Object pooling for performance
+
+Configurable parameters via GameConfig
+
+Event-based logic and observers
+
+Game states (INIT, RUNNING, GAME_OVER)
+
+Restart functionality
+
+Run event handling in a separate thread
+
+Thread-safe event queue
+
+Clear class responsibilities and easy extensibility
+
+🧱 Design Patterns to Use
+Strategy/Template → For object update/draw logic
+
+Observer → For reacting to game events (score, health, sounds, etc.)
+
+Event Queue + Dispatcher → Centralized event management
+
+Object Pool → For efficient memory and object reuse
+
+State Pattern → Game states (INIT, RUNNING, GAME_OVER)
+
+Factory (optional) → For spawning objects with random configs
+
+📁 Folder Structure to Generate
+graphql
+Copy
+Edit
+bubble_pop/
+├── main.py                      # Entry point for the game
+├── config/
+│   └── game_config.py           # Game tuning constants
+├── core/
+│   ├── game_engine.py           # Main game loop
+│   ├── game_state.py            # Enum for INIT, RUNNING, GAME_OVER
+│   ├── game_timer.py            # Countdown timer logic
+├── input/
+│   └── hand_tracker.py          # MediaPipe-based hand detection
+├── objects/
+│   ├── base_object.py           # IGameObject and AbstractFallingObject
+│   ├── bubble.py                # Bubble class
+│   ├── power.py                 # Power class
+│   ├── object_manager.py        # Tracks, updates, draws objects
+│   └── object_pool.py           # Reuse bubble/power instances
+├── rendering/
+│   └── renderer.py              # OpenCV-based drawing
+├── events/
+│   ├── base_event.py            # GameEvent base class
+│   ├── event_types.py           # All event subclasses
+│   ├── event_manager.py         # Dispatch loop + thread
+│   └── observers/
+│       ├── score_observer.py
+│       ├── health_observer.py
+│       ├── sound_observer.py
+│       ├── spawner_observer.py
+│       └── freeze_observer.py   # For freeze power
+├── assets/
+│   ├── sounds/
+│   │   └── pop.wav              # Sound assets
+│   └── fonts/
+│       └── Roboto.ttf           # Optional font
+└── tests/
+    ├── test_collision.py        # Test for hit detection
+    ├── test_event_dispatch.py   # Event + observer behavior
+    ├── test_object_pool.py      # Pool reuse test
+    ├── test_game_state.py       # Game state transitions
+    └── test_hand_tracker.py     # Valid tracking of fists
+🧪 Generate Minimal Unit Test Stubs
+For each key module, create unit test stubs using pytest. The goal is to ensure testability and give developers a foundation to build on.
+
+Include:
+
+test_is_hit_when_fist_inside_bubble()
+
+test_health_decreases_on_miss_event()
+
+test_score_increments_on_hit_event()
+
+test_event_is_dispatched_correctly()
+
+test_event_queue_handles_multiple_events()
+
+test_object_pool_reuses_instances()
+
+test_freeze_power_freezes_all_bubbles()
+
+test_hand_tracker_detects_fist_position()
+
+✅ Expectations
+Modular, object-oriented code following SRP and OCP
+
+Good naming, small methods, logical responsibility split
+
+Document any assumptions inline with comments
+
+No monolithic scripts; use multiple files and clear interfaces
+
+Constants/configs should be easily adjustable
+
+Performance-optimized via pooling and configurable throttling
+
+🎯 Generate the full Python codebase described above with test stubs and folder structure. Ready to be dropped into a local dev environment.
+
+Let me know if you'd like an actual sample repo scaffold or I can help you paste this into WindSurf or other tool!
+
+
+
+
+
+
+
+
+You said:
+include the low level details of the class in this prompt like you did in the earlier prompt so that code generation tool doesn't hallucinate.
+
+
+ChatGPT said:
+Perfect. Below is your complete WindSurf code generation prompt, now updated to include low-level design details, such as class names, responsibilities, relationships, and key methods. This ensures minimal hallucination and maximum correctness from the code generation tool.
+
+🧠 WindSurf Prompt: Bubble Pop Game — Computer Vision Based | Event-Driven | Python | OpenCV + MediaPipe
+You are a powerful coding AI. Please generate a modular, extensible, event-driven, object-oriented Python codebase for a real-time game called bubble_pop.
+
+The game is built using:
+
+OpenCV (for video capture & rendering),
+
+MediaPipe (for tracking hands/fists),
+
+and follows OOP, SOLID principles, design patterns, and multithreaded event handling.
+
+🎮 Game Description
+Bubbles (circles) fall from the top of the screen.
+
+User pops them using their fist (tracked using MediaPipe). Hit = when fist center enters the bubble radius.
+
+Score +1 on each pop. Health -10% (configurable) for each bubble missed.
+
+Powers (F, D, H) fall similarly:
+
+F: Freeze all objects for 5s
+
+D: Destroy all bubbles
+
+H: Restore full health
+
+Game starts after a 10s countdown and ends when health is 0.
+
+Restart is allowed on game over screen.
+
+💡 Design Philosophy
+Event-Driven, using the Observer pattern
+
+Threaded: Event processing runs in separate thread
+
+Central GameEngine runs the game loop
+
+Use Object Pooling for memory reuse of game objects
+
+Collision detection rate is configurable (default every 5 frames)
+
+Constants like speed, spawn probability, radius are all configurable
+
+Classes must be small, cohesive, testable
+
+📦 Folder & File Structure
+css
+Copy
+Edit
+bubble_pop/
+├── main.py
+├── config/
+│   └── game_config.py
+├── core/
+│   ├── game_engine.py
+│   ├── game_state.py
+│   └── game_timer.py
+├── input/
+│   └── hand_tracker.py
+├── objects/
+│   ├── base_object.py
+│   ├── bubble.py
+│   ├── power.py
+│   ├── object_manager.py
+│   └── object_pool.py
+├── rendering/
+│   └── renderer.py
+├── events/
+│   ├── base_event.py
+│   ├── event_types.py
+│   ├── event_manager.py
+│   └── observers/
+│       ├── score_observer.py
+│       ├── health_observer.py
+│       ├── sound_observer.py
+│       ├── spawner_observer.py
+│       └── freeze_observer.py
+├── assets/
+│   └── sounds/pop.wav
+└── tests/
+    ├── test_collision.py
+    ├── test_event_dispatch.py
+    ├── test_object_pool.py
+    ├── test_game_state.py
+    └── test_hand_tracker.py
+🔍 Low-Level Design Details
+✅ GameEngine
+Loop manager: Captures frames, processes game logic, updates state
+
+Key methods:
+
+run(): Starts loop
+
+_process_frame(): Updates objects, handles collision
+
+_check_game_state()
+
+_dispatch_events()
+
+✅ GameState
+Enum with: INIT, RUNNING, GAME_OVER
+
+✅ HandTracker
+Uses MediaPipe
+
+Methods:
+
+get_fist_positions(frame) → List[Point]
+
+draw_fist_indicators(frame, positions)
+
+✅ AbstractFallingObject (Base class for all objects)
+Attributes: x, y, speed, radius, active, type
+
+Methods:
+
+update(dt)
+
+draw(frame)
+
+is_hit(fist_position)
+
+reset(x, y, speed, radius)
+
+✅ Bubble and Power
+Inherit AbstractFallingObject
+
+Power has power_type: Enum (F, D, H)
+
+✅ ObjectPool
+Maintains lists of reusable Bubble and Power instances
+
+Methods:
+
+get_bubble(), get_power()
+
+release(obj)
+
+✅ ObjectManager
+Manages all on-screen objects
+
+Methods:
+
+update_all(dt)
+
+draw_all(frame)
+
+check_hits(fist_positions) → List[HitInfo]
+
+check_misses() → List[MissInfo]
+
+add_object(obj)
+
+✅ Renderer
+Methods:
+
+draw_score(frame, score)
+
+draw_health_bar(frame, health)
+
+draw_timer(frame, seconds_left)
+
+draw_game_over(frame)
+
+✅ GameTimer
+Handles countdown state
+
+Methods:
+
+start(duration)
+
+seconds_left()
+
+is_expired()
+
+✅ EventManager (Synchronous Dispatch, Threaded)
+Thread-safe Queue of events
+
+Methods:
+
+post(event)
+
+start_dispatch_loop()
+
+register_observer(event_type, observer)
+
+✅ GameEvent + Subclasses
+BubbleHitEvent, BubbleMissedEvent, PowerHitEvent, GameOverEvent
+
+✅ Observers
+Each observer implements:
+
+python
+Copy
+Edit
+class IObserver:
+    def handle(event: GameEvent)
+ScoreObserver: Increments score
+
+HealthObserver: Reduces health, triggers GameOverEvent if needed
+
+SoundObserver: Plays pop sound
+
+SpawnerObserver: Adds new object to screen
+
+FreezeObserver: Temporarily freezes bubble movement
+
+✅ GameConfig
+Constants like:
+
+COLLISION_FRAME_INTERVAL
+
+BUBBLE_RADIUS_RANGE
+
+POWER_CHANCE
+
+MISS_HEALTH_PENALTY
+
+BUBBLE_SPEED_RANGE, etc.
+
+🧪 Unit Test Stubs (in tests/ folder)
+python
+Copy
+Edit
+def test_fist_hits_bubble_within_radius()
+def test_health_decreases_on_bubble_miss()
+def test_score_increments_on_bubble_hit()
+def test_event_is_dispatched_to_registered_observer()
+def test_freeze_power_freezes_all_objects()
+def test_object_pool_reuses_instances()
+def test_game_state_transitions()
+def test_hand_tracker_detects_fist_position()
+✅ Summary
+Use multiple files, not one monolithic script
+
+Code must be modular, SOLID-compliant, readable
+
+Configurable constants, extensible observers
+
+Game loop must run fast, rendering every frame
+
+Event dispatching must not block the main thread
+
+🎯 Generate the full codebase described above with all class files, tests, and structure. Do not merge files. Output ready-to-run Python project.
