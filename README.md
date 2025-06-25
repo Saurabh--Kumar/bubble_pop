@@ -1,53 +1,136 @@
-# Fruit Ninja-like Game
+# Bubble Pop Game
 
-This project simulates a basic version of the popular mobile game Fruit Ninja, using computer vision techniques. It utilizes OpenCV for video capture and display, and Google MediaPipe for fist detection to mimic the gameplay mechanics.
+A fun and interactive game where you pop falling bubbles using your hands, powered by computer vision. Built with Python, OpenCV, and MediaPipe.
 
-## Prerequisites
+## 🎮 Features
 
-To run this project, you'll need the following installed on your system:
+- Real-time hand tracking using MediaPipe
+- Multiple power-ups (Freeze, Destroy, Heal)
+- Score tracking and health system
+- Smooth animations and visual effects
+- Sound effects and game states
+- Configurable game settings
 
-- Python 3.x
-- OpenCV
-- MediaPipe
-- NumPy
+## 🛠️ Prerequisites
 
-You can install the necessary Python packages using pip:
+- Python 3.8+
+- Webcam
+- Python packages (install via `requirements.txt`)
 
-```bash
-pip install opencv-python mediapipe numpy
-```
+## 🚀 Installation
 
-## Project Structure
-
-- **main.py**: The entry point of the application. It integrates all components and runs the game loop.
-- **video_capture.py**: Handles video capture and display settings.
-- **hand_detection.py**: Sets up hand detection using MediaPipe to track fists.
-- **gameplay.py**: Contains the logic for generating, updating, and rendering game objects.
-
-## Setting Up and Running the Game
-
-1. **Clone the Repository**:
+1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/yourusername/bubble_pop.git
    cd bubble_pop
    ```
 
-2. **Run the Game**:
-   - Execute the `main.py` script to start the game:
+2. **Create and activate a virtual environment (recommended)**
    ```bash
-   python src/main.py
+   python -m venv venv
+   .\venv\Scripts\activate  # On Windows
+   source venv/bin/activate  # On macOS/Linux
    ```
 
-## Gameplay Instructions
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-- Ensure your computer's front camera is accessible and unobstructed.
-- The game runs in fullscreen mode.
-- Hit the falling objects with your fist as detected by the camera to gain points.
-- Press 'Q' to exit the game.
+## 🎮 How to Play
 
-## Troubleshooting
+1. **Start the game**
+   ```bash
+   python main.py
+   ```
 
-- **Camera Issues**: Ensure that your camera is properly connected and the correct drivers are installed.
-- **Dependency Errors**: Verify that all required packages are installed with the correct versions.
+2. **Game Controls**
+   - Use your fists to pop the falling bubbles
+   - Collect power-ups:
+     - ❄️ `F` - Freeze: Freezes all bubbles temporarily
+     - 💥 `D` - Destroy: Removes all bubbles
+     - ❤️ `H` - Heal: Restores your health
+   - Press `R` to restart after game over
+   - Press `Q` or `ESC` to quit
 
-Feel free to modify the code to adjust object speed, size, and game dynamics to better suit your preferences or screen setup.
+3. **Scoring**
+   - Pop a bubble: +1 point
+   - Miss a bubble: -10% health
+   - Game ends when health reaches 0%
+
+## 🏗️ Project Structure
+
+```
+bubble_pop/
+├── main.py                 # Entry point
+├── requirements.txt        # Dependencies
+├── README.md              # This file
+├── assets/                # Game assets
+│   └── sounds/            # Sound effects
+└── bubble_pop/            # Main package
+    ├── __init__.py
+    ├── config/            # Game configuration
+    │   └── game_config.py
+    ├── core/              # Core game logic
+    │   ├── game_engine.py
+    │   └── game_state.py
+    ├── input/             # Input handling
+    │   └── hand_tracker.py
+    ├── objects/           # Game objects
+    │   ├── base_object.py
+    │   ├── bubble.py
+    │   ├── power.py
+    │   └── object_manager.py
+    ├── rendering/         # Rendering logic
+    │   └── renderer.py
+    └── events/            # Event system
+        ├── base_event.py
+        ├── event_manager.py
+        └── observers/     # Event observers
+            ├── score_observer.py
+            ├── health_observer.py
+            ├── sound_observer.py
+            ├── spawner_observer.py
+            └── freeze_observer.py
+```
+
+## ⚙️ Configuration
+
+You can modify game settings in `bubble_pop/config/game_config.py`:
+- Window size and FPS
+- Game difficulty
+- Bubble properties
+- Power-up spawn rates
+- And more!
+
+## 🎯 Tips
+
+- Make quick, deliberate movements to pop bubbles
+- Try to hit multiple bubbles in one motion
+- Save power-ups for when you really need them
+- Keep an eye on your health!
+
+## 🐛 Troubleshooting
+
+- **Camera not working**
+  - Ensure no other application is using the camera
+  - Check your system's camera permissions
+
+- **Dependency issues**
+  - Make sure you've installed all requirements
+  - Try creating a fresh virtual environment
+
+- **Performance problems**
+  - Reduce the game resolution in `game_config.py`
+  - Close other resource-intensive applications
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [OpenCV](https://opencv.org/) for computer vision
+- [MediaPipe](https://mediapipe.dev/) for hand tracking
+- [PyGame](https://www.pygame.org/) for audio
+- All contributors and testers
