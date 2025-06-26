@@ -106,7 +106,7 @@ class GameEngine:
         
         # Get current fist positions
         fist_positions = self.hand_tracker.get_fist_positions()
-        if not fist_positions:
+        if not fist_positions or len(fist_positions) < 1:
             return
             
         # Check for hits
