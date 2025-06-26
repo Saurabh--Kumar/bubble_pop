@@ -26,7 +26,7 @@ class HandTracker:
         self.position_history: Dict[int, List[Tuple[float, float]]] = {}
         self.max_history = 5
     
-    def process_frame(self, frame):
+    def process_frame(self, frame: np.ndarray) -> None:
         """
         Process a frame to detect hands and update fist positions.
         
@@ -41,6 +41,9 @@ class HandTracker:
         
         # Reset fist positions
         self.fist_positions = []
+        
+        # Track which hands are currently visible
+        current_hand_ids = set()
         
         # Draw hand landmarks for debugging
         if results.multi_hand_landmarks:
@@ -77,6 +80,8 @@ class HandTracker:
                     
                     # Update position history for this hand
                     hand_id = id(hand_landmarks)
+                    current_hand_ids.add(hand_id)
+                    
                     if hand_id not in self.position_history:
                         self.position_history[hand_id] = []
                     
@@ -85,11 +90,33 @@ class HandTracker:
                     # Limit history size
                     if len(self.position_history[hand_id]) > self.max_history:
                         self.position_history[hand_id].pop(0)
+        
+        # Remove position history for hands that are no longer visible
+        # This prevents ghost positions from lingering after hands are removed
+        for hand_id in list(self.position_history.keys()):
+            if hand_id not in current_hand_ids:
+                del self.position_history[hand_id]
+        
+        # Draw debug info for visible hands
+        if results.multi_hand_landmarks:
+            for hand_landmarks in results.multi_hand_landmarks:
+                landmarks = hand_landmarks.landmark
+                is_fist, confidence = self._is_fist(landmarks)
+                
+                if is_fist:
+                    # Get center of the fist (using wrist and middle finger MCP)
+                    wrist = landmarks[self.mp_hands.HandLandmark.WRIST]
+                    mcp = landmarks[self.mp_hands.HandLandmark.MIDDLE_FINGER_MCP]
+                    x = (wrist.x + mcp.x) / 2
+                    y = (wrist.y + mcp.y) / 2
+                    height, width = frame.shape[:2]
+                    px = int(x * width)
+                    py = int(y * height)
                     
-                    # Draw debug info
+                    # Draw debug info for fist
                     cv2.circle(frame, (px, py), 10, (0, 0, 255), -1)
                     cv2.putText(frame, f'Fist: {confidence:.2f}', (px + 15, py - 10),
-                               cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
+                              cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
                 else:
                     # Draw why it's not a fist (for debugging)
                     wrist = landmarks[self.mp_hands.HandLandmark.WRIST]
@@ -97,7 +124,7 @@ class HandTracker:
                     wx = int(wrist.x * width)
                     wy = int(wrist.y * height)
                     cv2.putText(frame, f'Not a fist: {confidence:.2f}', (wx, wy - 20),
-                               cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
+                              cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
     
     def _is_fist(self, landmarks) -> tuple[bool, float]:
         """
@@ -151,21 +178,21 @@ class HandTracker:
         
         # Calculate confidence (0 to 1)
         confidence = 0.0
-        if index_curled: confidence += 0.25
-        if middle_curled: confidence += 0.25
-        if ring_curled: confidence += 0.25
-        if pinky_curled: confidence += 0.15
-        if thumb_over: confidence += 0.1
+        if index_curled:
+            confidence += 0.25
+        if middle_curled:
+            confidence += 0.25
+        if ring_curled:
+            confidence += 0.25
+        if pinky_curled:
+            confidence += 0.15
+        if thumb_over:
+            confidence += 0.1
         
         # Consider it a fist if confidence is above threshold
         is_fist = confidence > 0.7
         
         return is_fist, confidence
-        
-        # Check if thumb is over the fingers
-        thumb_over = thumb_tip.x > index_tip.x and thumb_tip.x < pinky_tip.x
-        
-        return fingers_closed and thumb_over
     
     def get_fist_positions(self) -> List[Tuple[float, float]]:
         """
@@ -186,7 +213,7 @@ class HandTracker:
             avg_y = sum(p[1] for p in positions) / len(positions)
             smoothed_positions.append((avg_x, avg_y))
         
-        return smoothed_positions or self.fist_positions
+        return smoothed_positions
     
     def draw_fists(self, frame):
         """Draw the detected fist positions on the frame with additional debug info."""

@@ -114,7 +114,9 @@ class Bubble(AbstractFallingObject):
             speed: New speed (random if None)
         """
         if x is None:
-            x = np.random.uniform(0, config.WINDOW_WIDTH)
+            # Keep bubbles within 10-90% of screen width for better pop detection
+            margin = config.WINDOW_WIDTH * 0.1
+            x = np.random.uniform(margin, config.WINDOW_WIDTH - margin)
             
         if y is None:
             y = -50  # Start above the screen

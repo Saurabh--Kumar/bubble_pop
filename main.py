@@ -53,10 +53,10 @@ def main():
             frame = cv2.flip(frame, 1)
             
             # Process frame through game engine
-            game_engine.process_frame(frame)
+            modified_frame =game_engine.process_frame(frame)
             
             # Display the frame
-            cv2.imshow('Bubble Pop', frame)
+            cv2.imshow('Bubble Pop', modified_frame)
             
             # Handle keyboard input
             key = cv2.waitKey(1) & 0xFF
@@ -69,8 +69,8 @@ def main():
                 cv2.waitKey(3000)
                 
                 # Ask for restart
-                frame = cv2.putText(
-                    frame, 
+                modified_frame = cv2.putText(
+                    modified_frame,
                     "Press 'R' to restart or 'Q' to quit", 
                     (config.WINDOW_WIDTH // 2 - 200, config.WINDOW_HEIGHT // 2 + 50),
                     cv2.FONT_HERSHEY_SIMPLEX, 
@@ -79,7 +79,7 @@ def main():
                     2, 
                     cv2.LINE_AA
                 )
-                cv2.imshow('Bubble Pop', frame)
+                cv2.imshow('Bubble Pop', modified_frame)
                 
                 # Wait for restart or quit
                 while True:

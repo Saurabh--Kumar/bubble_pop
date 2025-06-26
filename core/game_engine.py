@@ -44,7 +44,7 @@ class GameEngine:
         from events.observers.spawner_observer import SpawnerObserver
         from events.observers.freeze_observer import FreezeObserver
         
-        self.event_manager.register_observer(EventType.BUBBLE_HIT, ScoreObserver())
+        self.event_manager.register_observer(EventType.BUBBLE_HIT, ScoreObserver(self))
         self.event_manager.register_observer(EventType.BUBBLE_HIT, SoundObserver())
         self.event_manager.register_observer(EventType.BUBBLE_MISSED, HealthObserver())
         self.event_manager.register_observer(EventType.BUBBLE_HIT, SpawnerObserver(self.object_manager))
@@ -106,7 +106,7 @@ class GameEngine:
         
         # Get current fist positions
         fist_positions = self.hand_tracker.get_fist_positions()
-        if not fist_positions:
+        if not fist_positions or len(fist_positions) < 1:
             return
             
         # Check for hits

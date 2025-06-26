@@ -124,7 +124,9 @@ class Power(AbstractFallingObject):
             power_type: Type of power-up (random if None)
         """
         if x is None:
-            x = np.random.uniform(self.radius, config.WINDOW_WIDTH - self.radius)
+            # Keep power-ups within 10-90% of screen width for better interaction
+            margin = config.WINDOW_WIDTH * 0.1
+            x = np.random.uniform(margin, config.WINDOW_WIDTH - margin)
             
         if y is None:
             y = -self.radius * 2  # Start above the screen
