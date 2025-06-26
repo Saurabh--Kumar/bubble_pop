@@ -60,7 +60,9 @@ class ObjectManager:
             The spawned bubble
         """
         if x is None:
-            x = random.uniform(0, config.WINDOW_WIDTH)
+            # Keep bubbles within 10-90% of screen width for better pop detection
+            margin = config.WINDOW_WIDTH * 0.1
+            x = random.uniform(margin, config.WINDOW_WIDTH - margin)
             
         if y is None:
             y = -50  # Start above the screen
@@ -89,7 +91,9 @@ class ObjectManager:
             The spawned power-up, or None if max objects reached
         """
         if x is None:
-            x = random.uniform(50, config.WINDOW_WIDTH - 50)
+            # Keep power-ups within 10-90% of screen width for better interaction
+            margin = config.WINDOW_WIDTH * 0.1
+            x = random.uniform(margin, config.WINDOW_WIDTH - margin)
             
         if y is None:
             y = -50  # Start above the screen
