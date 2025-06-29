@@ -94,6 +94,33 @@ bubble_pop/
             └── freeze_observer.py
 ```
 
+## 🧪 Testing
+
+The project includes unit tests to ensure code quality and functionality. Here's how to run them:
+
+1. **Install test dependencies** (if not already installed):
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Run all tests** with coverage report:
+   ```bash
+   pytest --cov=./ --cov-report=html
+   ```
+   This will generate an HTML coverage report in the `htmlcov` directory.
+
+3. **Run specific test files**:
+   ```bash
+   # Run all tests in a specific file
+   pytest tests/test_collision.py -v
+   
+   # Run a specific test case
+   pytest tests/test_event_dispatch.py::TestEventDispatch::test_register_and_notify_observer -v
+   ```
+
+4. **Test coverage report**:
+   After running tests with coverage, open `htmlcov/index.html` in your browser to see the coverage report.
+
 ## ⚙️ Configuration
 
 You can modify game settings in `bubble_pop/config/game_config.py`:
