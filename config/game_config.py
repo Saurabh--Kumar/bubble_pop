@@ -30,11 +30,11 @@ class GameConfig:
     
     # Bubble settings
     BUBBLE_RADIUS_RANGE: Tuple[int, int] = (30, 50)
-    BUBBLE_SPEED_RANGE: Tuple[float, float] = (2.0, 5.0)
-    BUBBLE_SPAWN_RATE: float = 0.03  # probability per frame
+    BUBBLE_SPEED_RANGE: Tuple[float, float] = (20.0, 30.0)
+    BUBBLE_SPAWN_RATE: float = 0.001  # probability per frame
     
     # Power-up settings
-    POWER_SPAWN_RATE: float = 0.005  # probability per frame
+    POWER_SPAWN_RATE: float = 0.0005  # probability per frame
     POWER_DURATION: float = 5.0  # seconds
     
     # Hand tracking

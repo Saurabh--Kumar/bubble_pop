@@ -11,7 +11,7 @@ class Power(AbstractFallingObject):
     
     # Power-up properties
     POWER_RADIUS = 25
-    POWER_SPEED = 3.0
+    POWER_SPEED = 50.0
     
     # Colors for different power types
     POWER_COLORS = {
