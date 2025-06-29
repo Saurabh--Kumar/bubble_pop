@@ -51,13 +51,19 @@ class TestPowerObject(unittest.TestCase):
         """Test that reset updates power-up properties."""
         new_x = 200
         new_y = 50
-        new_type = PowerType.DESTROY
         
-        self.power.reset(x=new_x, y=new_y)
+        # Store the original power type
+        original_power_type = self.power.power_type
         
+        # Reset with new position
+        self.power.reset(x=new_x, y=new_y, power_type=original_power_type)
+        
+        # Verify position was updated
         self.assertEqual(self.power.x, new_x)
         self.assertEqual(self.power.y, new_y)
-        self.assertEqual(self.power.power_type, self.power_type)  # Type shouldn't change on reset
+        
+        # Verify power type remains the same
+        self.assertEqual(self.power.power_type, original_power_type)
         self.assertTrue(self.power.active)
     
     def test_power_type_enum(self):

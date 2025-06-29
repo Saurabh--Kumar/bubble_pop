@@ -65,11 +65,11 @@ class TestGameEngine(unittest.TestCase):
     def test_register_observers(self):
         """Test that observers are registered during initialization."""
         # Import the observers to patch them
-        with patch('core.game_engine.ScoreObserver') as mock_score_observer_cls, \
-             patch('core.game_engine.HealthObserver') as mock_health_observer_cls, \
-             patch('core.game_engine.SoundObserver') as mock_sound_observer_cls, \
-             patch('core.game_engine.SpawnerObserver') as mock_spawner_observer_cls, \
-             patch('core.game_engine.FreezeObserver') as mock_freeze_observer_cls:
+        with patch('events.observers.score_observer.ScoreObserver', create=True) as mock_score_observer_cls, \
+             patch('events.observers.health_observer.HealthObserver', create=True) as mock_health_observer_cls, \
+             patch('events.observers.sound_observer.SoundObserver', create=True) as mock_sound_observer_cls, \
+             patch('events.observers.spawner_observer.SpawnerObserver', create=True) as mock_spawner_observer_cls, \
+             patch('events.observers.freeze_observer.FreezeObserver', create=True) as mock_freeze_observer_cls:
             
             # Create the engine which will register observers
             engine = self.GameEngine()
