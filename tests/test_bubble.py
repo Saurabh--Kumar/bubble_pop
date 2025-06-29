@@ -1,7 +1,7 @@
 import unittest
 import cv2
 import numpy as np
-from pathlib import Path
+from unittest.mock import patch
 
 from objects.bubble import Bubble
 from config.game_config import config
@@ -11,22 +11,29 @@ class TestBubble(unittest.TestCase):
         """Set up test fixtures."""
         self.width = 800
         self.height = 600
-        self.bubble = Bubble(self.width, self.height)
+        self.radius = 30
+        self.speed = 100
+        self.x = 400
+        self.y = 100
+        self.bubble = Bubble(x=self.x, y=self.y, radius=self.radius, speed=self.speed)
         
         # Create a blank test image
         self.test_img = np.zeros((self.height, self.width, 3), dtype=np.uint8)
     
-    def test_initial_position(self):
-        """Test that bubble is initialized within screen bounds."""
-        self.assertGreaterEqual(self.bubble.x, 0)
-        self.assertLessEqual(self.bubble.x, self.width)
-        self.assertEqual(self.bubble.y, self.height)  # Should start at bottom
+    def test_initial_properties(self):
+        """Test that bubble is initialized with correct properties."""
+        self.assertEqual(self.bubble.x, self.x)
+        self.assertEqual(self.bubble.y, self.y)
+        self.assertEqual(self.bubble.radius, self.radius)
+        self.assertEqual(self.bubble.speed, self.speed)
+        self.assertTrue(self.bubble.active)
     
     def test_update(self):
-        """Test that bubble moves up when updated."""
+        """Test that bubble moves down when updated."""
         initial_y = self.bubble.y
         self.bubble.update(1.0)  # 1 second has passed
-        self.assertLess(self.bubble.y, initial_y)  # Should move up
+        self.assertGreater(self.bubble.y, initial_y)  # Should move down
+        self.assertAlmostEqual(self.bubble.y, initial_y + self.speed * 1.0, places=5)
     
     def test_draw(self):
         """Test that drawing doesn't raise exceptions."""
@@ -36,12 +43,38 @@ class TestBubble(unittest.TestCase):
             self.fail(f"Drawing bubble raised an exception: {e}")
     
     def test_reset(self):
-        """Test that reset puts bubble back to bottom with new x position."""
-        initial_x = self.bubble.x
-        self.bubble.update(1.0)  # Move up
-        self.bubble.reset()
-        self.assertEqual(self.bubble.y, self.height)  # Back to bottom
-        self.assertNotEqual(self.bubble.x, initial_x)  # New x position
+        """Test that reset updates bubble properties."""
+        new_x = 200
+        new_y = 50
+        new_radius = 20
+        new_speed = 150
+        
+        self.bubble.reset(x=new_x, y=new_y, radius=new_radius, speed=new_speed)
+        
+        self.assertEqual(self.bubble.x, new_x)
+        self.assertEqual(self.bubble.y, new_y)
+        self.assertEqual(self.bubble.radius, new_radius)
+        self.assertEqual(self.bubble.speed, new_speed)
+        self.assertTrue(self.bubble.active)
+    
+    def test_is_hit(self):
+        """Test hit detection."""
+        # Position inside bubble
+        self.assertTrue(self.bubble.is_hit((self.x, self.y)))
+        # Position at edge
+        self.assertTrue(self.bubble.is_hit((self.x + self.radius, self.y)))
+        # Position outside bubble
+        self.assertFalse(self.bubble.is_hit((self.x + self.radius + 1, self.y)))
+    
+    def test_is_off_screen(self):
+        """Test off-screen detection."""
+        # Move bubble below screen
+        self.bubble.y = config.WINDOW_HEIGHT + self.radius + 1
+        self.assertTrue(self.bubble.is_off_screen())
+        
+        # Move bubble above screen
+        self.bubble.y = config.WINDOW_HEIGHT - self.radius - 1
+        self.assertFalse(self.bubble.is_off_screen())
 
 if __name__ == '__main__':
     unittest.main()
