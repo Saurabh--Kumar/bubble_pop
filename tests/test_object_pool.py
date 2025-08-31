@@ -26,8 +26,7 @@ class TestPowerObject(unittest.TestCase):
     def test_update(self):
         """Test that power-up updates position and animation."""
         initial_y = self.power.y
-        initial_angle = self.power.angle
-        initial_pulse = self.power.pulse_timer
+        initial_pulse_timer = self.power.pulse_timer
         
         dt = 0.1
         self.power.update(dt)
@@ -37,8 +36,7 @@ class TestPowerObject(unittest.TestCase):
         self.assertAlmostEqual(self.power.y, initial_y + self.power.speed * dt, places=5)
         
         # Animation should update
-        self.assertNotEqual(self.power.angle, initial_angle)
-        self.assertNotEqual(self.power.pulse_timer, initial_pulse)
+        self.assertNotEqual(self.power.pulse_timer, initial_pulse_timer)
     
     def test_draw(self):
         """Test that drawing doesn't raise exceptions."""

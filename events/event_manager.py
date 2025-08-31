@@ -1,77 +1,62 @@
 import queue
 import threading
-import time
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Type
 
-from events.base_event import GameEvent, EventType, IObserver, IObservable
+from events.base_event import GameEvent, EventType, IObserver
 
 
-class EventManager(IObservable):
-    """Manages game events and notifies observers."""
-    
+class EventManager:
+    """Manages game events and notifies observers in a separate thread."""
+
     def __init__(self):
-        """Initialize the event manager."""
-        super().__init__()
-        self._event_queue = queue.Queue()
+        self._event_queue: queue.Queue[Optional[GameEvent]] = queue.Queue()
+        self._observers: Dict[EventType, List[IObserver]] = {}
         self._running = False
         self._dispatch_thread: Optional[threading.Thread] = None
-        self._observers: Dict[EventType, List[IObserver]] = {}
-    
-    def post(self, event: GameEvent):
-        """
-        Post an event to the queue.
-        
-        Args:
-            event: Event to post
-        """
+
+    def register_observer(self, event_type: EventType, observer: IObserver) -> None:
+        """Register an observer for a specific event type."""
+        if event_type not in self._observers:
+            self._observers[event_type] = []
+        self._observers[event_type].append(observer)
+
+    def post(self, event: GameEvent) -> None:
+        """Post an event to the queue for asynchronous processing."""
         self._event_queue.put(event)
-    
-    def start_dispatch_loop(self):
+
+    def start_dispatch_loop(self) -> None:
         """Start the event dispatch loop in a separate thread."""
         if self._running:
             return
-            
         self._running = True
         self._dispatch_thread = threading.Thread(target=self._dispatch_loop, daemon=True)
         self._dispatch_thread.start()
-    
-    def stop_dispatch_loop(self):
+
+    def stop_dispatch_loop(self) -> None:
         """Stop the event dispatch loop."""
         self._running = False
-        
-        # Put a None event to unblock the queue if it's empty
-        self._event_queue.put(None)
-        
-        if self._dispatch_thread and self._dispatch_thread.is_alive():
-            self._dispatch_thread.join(timeout=1.0)
-    
-    def _dispatch_loop(self):
-        """Process events from the queue and notify observers."""
+        self._event_queue.put(None)  # Sentinel to unblock the queue
+        if self._dispatch_thread:
+            self._dispatch_thread.join()
+
+    def _dispatch_loop(self) -> None:
+        """Continuously process events from the queue and notify observers."""
         while self._running:
             try:
-                # Get event with timeout to allow checking self._running
-                try:
-                    event = self._event_queue.get(timeout=0.1)
-                    if event is None:  # Sentinel value to stop
-                        break
-                except queue.Empty:
-                    continue
-                
-                # Notify observers
+                event = self._event_queue.get(timeout=0.1)
+                if event is None:  # Sentinel value check
+                    break
+
                 if event.event_type in self._observers:
                     for observer in self._observers[event.event_type]:
-                        try:
-                            observer.handle(event)
-                        except Exception as e:
-                            print(f"Error in event handler: {e}")
-                
-                # Mark task as done
+                        observer.handle(event)
+
                 self._event_queue.task_done()
-                
+            except queue.Empty:
+                continue
             except Exception as e:
                 print(f"Error in event dispatch loop: {e}")
-                time.sleep(0.1)  # Prevent tight loop on error
-    
+
     def wait_for_events(self, timeout: Optional[float] = None) -> bool:
         """
         Wait for all events to be processed.

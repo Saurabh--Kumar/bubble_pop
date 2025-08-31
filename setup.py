@@ -6,8 +6,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
     name="bubble-pop",
     version="1.0.0",
-    author="Your Name",
-    author_email="your.email@example.com",
+    author="Saurabh Kumar",
+    author_email="bhardwajsaurabh10@gmail.com",
     description="A fun bubble popping game using computer vision",
     long_description=long_description,
     long_description_content_type="text/markdown",

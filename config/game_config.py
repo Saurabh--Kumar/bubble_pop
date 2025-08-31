@@ -12,7 +12,7 @@ class GameState(Enum):
 class PowerType(Enum):
     FREEZE = 'F'  # Freeze all bubbles
     DESTROY = 'D'  # Destroy all bubbles
-    HEAL = 'H'     # Restore health
+    HEALTH = 'H'     # Restore health
 
 
 @dataclass
@@ -31,10 +31,10 @@ class GameConfig:
     # Bubble settings
     BUBBLE_RADIUS_RANGE: Tuple[int, int] = (30, 50)
     BUBBLE_SPEED_RANGE: Tuple[float, float] = (20.0, 30.0)
-    BUBBLE_SPAWN_RATE: float = 0.001  # probability per frame
+    BUBBLE_SPAWN_RATE: float = 0.01  # probability per frame
     
     # Power-up settings
-    POWER_SPAWN_RATE: float = 0.0005  # probability per frame
+    POWER_SPAWN_RATE: float = 0.002  # probability per frame
     POWER_DURATION: float = 5.0  # seconds
     
     # Hand tracking
@@ -49,7 +49,7 @@ class GameConfig:
     COLOR_BUBBLE: Tuple[int, int, int] = (255, 255, 0)  # Yellow
     COLOR_POWER_FREEZE: Tuple[int, int, int] = (255, 0, 0)  # Blue
     COLOR_POWER_DESTROY: Tuple[int, int, int] = (0, 0, 255)  # Red
-    COLOR_POWER_HEAL: Tuple[int, int, int] = (0, 255, 0)  # Green
+    COLOR_POWER_HEALTH: Tuple[int, int, int] = (0, 255, 0)  # Green
     COLOR_FIST: Tuple[int, int, int] = (0, 255, 255)  # Cyan
     COLOR_TEXT: Tuple[int, int, int] = (255, 255, 255)  # White
     
@@ -57,6 +57,10 @@ class GameConfig:
     FONT_FACE: int = 0  # cv2.FONT_HERSHEY_SIMPLEX
     FONT_SCALE: float = 1.0
     FONT_THICKNESS: int = 2
+
+    # Object Types
+    BUBBLE = 'bubble'
+    POWER = 'power'
 
 
 # Singleton instance
