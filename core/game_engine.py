@@ -275,17 +275,7 @@ class GameEngine:
         cv2.putText(frame, score_text, (score_x, score_y), 
                    config.FONT_FACE, config.FONT_SCALE * 1.5, 
                    (255, 255, 255), config.FONT_THICKNESS)
-        
-        # Restart instructions
-        restart_text = "Press 'R' to restart"
-        restart_size = cv2.getTextSize(restart_text, config.FONT_FACE, 
-                                     config.FONT_SCALE, config.FONT_THICKNESS)[0]
-        restart_x = (config.WINDOW_WIDTH - restart_size[0]) // 2
-        restart_y = score_y + 80
-        
-        cv2.putText(frame, restart_text, (restart_x, restart_y), 
-                   config.FONT_FACE, config.FONT_SCALE, 
-                   (200, 200, 200), config.FONT_THICKNESS)
+
     
     def process_frame(self, frame):
         """Process a single frame - update hand tracking and game state"""
