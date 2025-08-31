@@ -49,7 +49,7 @@ A fun and interactive game where you pop falling bubbles using your hands, power
    - Collect power-ups:
      - ❄️ `F` - Freeze: Freezes all bubbles temporarily
      - 💥 `D` - Destroy: Removes all bubbles
-     - ❤️ `H` - Heal: Restores your health
+     - ❤️ `H` - Health: Restores your health
    - Press `R` to restart after game over
    - Press `Q` or `ESC` to quit
 

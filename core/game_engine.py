@@ -247,45 +247,52 @@ class GameEngine:
             self.state = GameState.RUNNING
     
     def _draw_game_over(self, frame):
-        # Semi-transparent overlay
+        # Create a copy of the frame to work on
         overlay = frame.copy()
+        
+        # Draw semi-transparent black overlay
         cv2.rectangle(overlay, (0, 0), (config.WINDOW_WIDTH, config.WINDOW_HEIGHT), 
                      (0, 0, 0), -1)
-        alpha = 0.8  # Slightly more opaque for better text visibility
+        alpha = 0.8  # 80% opacity
         cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
         
-        # Game Over text
+        # Game Over text with shadow for better visibility
         text = "GAME OVER"
-        text_size = cv2.getTextSize(text, config.FONT_FACE, 
-                                  config.FONT_SCALE * 3, config.FONT_THICKNESS * 2)[0]
+        text_scale = config.FONT_SCALE * 3
+        text_thickness = config.FONT_THICKNESS * 2
+        text_size = cv2.getTextSize(text, config.FONT_FACE, text_scale, text_thickness)[0]
         text_x = (config.WINDOW_WIDTH - text_size[0]) // 2
         text_y = config.WINDOW_HEIGHT // 3
         
+        # Draw shadow
+        cv2.putText(frame, text, (text_x + 2, text_y + 2), 
+                   config.FONT_FACE, text_scale, 
+                   (0, 0, 0), text_thickness)
+        # Draw main text
         cv2.putText(frame, text, (text_x, text_y), 
-                   config.FONT_FACE, config.FONT_SCALE * 3, 
-                   (0, 0, 255), config.FONT_THICKNESS * 2)
+                   config.FONT_FACE, text_scale, 
+                   (0, 0, 255), text_thickness)
         
-        # Score
+        # Score with shadow
         score_text = f"Final Score: {self.score}"
+        score_scale = config.FONT_SCALE * 1.5
         score_size = cv2.getTextSize(score_text, config.FONT_FACE, 
-                                   config.FONT_SCALE * 1.5, config.FONT_THICKNESS)[0]
+                                   score_scale, config.FONT_THICKNESS)[0]
         score_x = (config.WINDOW_WIDTH - score_size[0]) // 2
         score_y = text_y + 100
         
+        # Draw shadow
+        cv2.putText(frame, score_text, (score_x + 1, score_y + 1), 
+                   config.FONT_FACE, score_scale, 
+                   (0, 0, 0), config.FONT_THICKNESS + 1)
+        # Draw main text
         cv2.putText(frame, score_text, (score_x, score_y), 
-                   config.FONT_FACE, config.FONT_SCALE * 1.5, 
+                   config.FONT_FACE, score_scale, 
                    (255, 255, 255), config.FONT_THICKNESS)
         
-        # Restart instructions
-        restart_text = "Press 'R' to restart"
-        restart_size = cv2.getTextSize(restart_text, config.FONT_FACE, 
-                                     config.FONT_SCALE, config.FONT_THICKNESS)[0]
-        restart_x = (config.WINDOW_WIDTH - restart_size[0]) // 2
-        restart_y = score_y + 80
-        
-        cv2.putText(frame, restart_text, (restart_x, restart_y), 
-                   config.FONT_FACE, config.FONT_SCALE, 
-                   (200, 200, 200), config.FONT_THICKNESS)
+        # Make sure to return the modified frame
+        return frame
+
     
     def process_frame(self, frame):
         """Process a single frame - update hand tracking and game state"""
