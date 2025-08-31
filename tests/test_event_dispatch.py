@@ -37,6 +37,5 @@ class TestEventDispatch(unittest.TestCase):
 
         self.mock_observer.handle.assert_called_once_with(event)
 
-
 if __name__ == '__main__':
     unittest.main()
