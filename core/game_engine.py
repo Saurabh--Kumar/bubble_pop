@@ -1,11 +1,6 @@
 import cv2
 import time
 import numpy as np
-from typing import Optional, List, Tuple, Dict, Any
-from dataclasses import dataclass
-from enum import Enum
-import threading
-import queue
 
 from config.game_config import config, GameState
 from input.hand_tracker import HandTracker
@@ -23,6 +18,7 @@ class GameEngine:
         self.last_collision_check = 0
         self.start_time = time.time()
         self.freeze_until = 0
+        self.is_frozen = False
         
         # Initialize components
         self.hand_tracker = HandTracker()
@@ -37,29 +33,30 @@ class GameEngine:
         self.event_manager.start_dispatch_loop()
     
     def _register_observers(self):
-        """Register all game event observers."""
         from events.observers.score_observer import ScoreObserver
         from events.observers.health_observer import HealthObserver
         from events.observers.sound_observer import SoundObserver
-        from events.observers.spawner_observer import SpawnerObserver
         from events.observers.freeze_observer import FreezeObserver
+        from events.observers.destroy_observer import DestroyObserver
+        from events.observers.power_health_observer import PowerHealthObserver
         
         self.event_manager.register_observer(EventType.BUBBLE_HIT, ScoreObserver(self))
         self.event_manager.register_observer(EventType.BUBBLE_HIT, SoundObserver())
         self.event_manager.register_observer(EventType.BUBBLE_MISSED, HealthObserver(self))
-        self.event_manager.register_observer(EventType.BUBBLE_HIT, SpawnerObserver(self.object_manager))
         self.event_manager.register_observer(EventType.POWER_ACTIVATED, FreezeObserver(self))
+        self.event_manager.register_observer(EventType.POWER_ACTIVATED, DestroyObserver(self))
+        self.event_manager.register_observer(EventType.POWER_ACTIVATED, PowerHealthObserver(self))
     
     def update(self, dt: float):
         """Update game state"""
         if self.state != GameState.RUNNING:
             return
             
+        # Check and update freeze state
+        self._update_freeze_state()
+
         # Update objects
-        current_time = time.time()
-        is_frozen = current_time < self.freeze_until
-        
-        if not is_frozen:
+        if not self.is_frozen:
             self.object_manager.update_all(dt)
         
         # Spawn new objects
@@ -75,12 +72,19 @@ class GameEngine:
         if self.health <= 0:
             self.state = GameState.GAME_OVER
     
+    def _update_freeze_state(self):
+        """Checks if the freeze duration has expired and unfreezes objects."""
+        if self.is_frozen and time.time() >= self.freeze_until:
+            self.is_frozen = False
+            self.object_manager.freeze_all(False)
+            self.event_manager.post(GameEvent(EventType.FREEZE_END))
+    
     def _maybe_spawn_objects(self):
         """Randomly spawn new bubbles and power-ups"""
-        if np.random.random() < config.BUBBLE_SPAWN_RATE:
+        if np.random.uniform() < config.BUBBLE_SPAWN_RATE:
             self.object_manager.spawn_bubble()
             
-        if np.random.random() < config.POWER_SPAWN_RATE:
+        if np.random.uniform() < config.POWER_SPAWN_RATE:
             self.object_manager.spawn_power()
     
     def _check_missed_objects(self):
@@ -95,7 +99,6 @@ class GameEngine:
                 self.object_manager.remove_object(obj)
     
     def _check_collisions(self):
-        """Check for collisions between fists and objects"""
         self.frame_count += 1
         
         # Only check collisions every N frames for performance
@@ -113,18 +116,17 @@ class GameEngine:
         for obj in self.object_manager.get_objects():
             for fist_pos in fist_positions:
                 if obj.is_hit(fist_pos):
-                    if obj.type == "bubble":
-                        self.event_manager.post(GameEvent(
-                            EventType.BUBBLE_HIT,
-                            {"object": obj}
-                        ))
-                    else:  # Power-up
-                        self.event_manager.post(GameEvent(
-                            EventType.POWER_ACTIVATED,
-                            {"object": obj, "power_type": obj.power_type}
-                        ))
-                    self.object_manager.remove_object(obj)
+                    self._handle_hit(obj)
                     break  # Object can only be hit once
+    
+    def _handle_hit(self, obj):
+        event_type = EventType.BUBBLE_HIT if obj.type == "bubble" else EventType.POWER_ACTIVATED
+        payload = {"object": obj}
+        if event_type == EventType.POWER_ACTIVATED:
+            payload["power_type"] = obj.power_type
+
+        self.event_manager.post(GameEvent(event_type, payload))
+        self.object_manager.remove_object(obj)
     
     def draw(self, frame):
         """Draw the current game state on top of the camera frame"""
@@ -157,14 +159,17 @@ class GameEngine:
         frame[:] = frame_copy
     
     def _draw_ui(self, frame):
-        """Draw the user interface (score, health, etc.)"""
-        # Draw score
+        self._draw_score(frame)
+        self._draw_health_bar(frame)
+        self._draw_freeze_indicator(frame)
+    
+    def _draw_score(self, frame):
         score_text = f"Score: {self.score}"
         cv2.putText(frame, score_text, (10, 30), 
                    config.FONT_FACE, config.FONT_SCALE, 
                    config.COLOR_TEXT, config.FONT_THICKNESS)
         
-        # Draw health bar
+    def _draw_health_bar(self, frame):
         health_bar_width = 200
         health_bar_height = 20
         health_bar_x = config.WINDOW_WIDTH - health_bar_width - 10
@@ -206,7 +211,7 @@ class GameEngine:
                    config.FONT_FACE, config.FONT_SCALE * 0.7, 
                    (0, 0, 0), config.FONT_THICKNESS)
         
-        # Freeze indicator
+    def _draw_freeze_indicator(self, frame):
         if time.time() < self.freeze_until:
             freeze_text = f"FREEZE! {int(self.freeze_until - time.time())}s"
             text_size = cv2.getTextSize(freeze_text, config.FONT_FACE, 
@@ -219,7 +224,6 @@ class GameEngine:
                        (255, 255, 255), config.FONT_THICKNESS + 1)
     
     def _draw_countdown(self, frame):
-        """Draw the initial countdown"""
         elapsed = time.time() - self.start_time
         if elapsed < config.INITIAL_COUNTDOWN:
             countdown = int(config.INITIAL_COUNTDOWN - elapsed) + 1
@@ -243,7 +247,6 @@ class GameEngine:
             self.state = GameState.RUNNING
     
     def _draw_game_over(self, frame):
-        """Draw the game over screen"""
         # Semi-transparent overlay
         overlay = frame.copy()
         cv2.rectangle(overlay, (0, 0), (config.WINDOW_WIDTH, config.WINDOW_HEIGHT), 
@@ -325,6 +328,7 @@ class GameEngine:
         self.last_collision_check = 0
         self.start_time = time.time()
         self.freeze_until = 0
+        self.is_frozen = False
         
         # Reset components
         self.object_manager.reset()

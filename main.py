@@ -53,7 +53,7 @@ def main():
             frame = cv2.flip(frame, 1)
             
             # Process frame through game engine
-            modified_frame =game_engine.process_frame(frame)
+            modified_frame = game_engine.process_frame(frame)
             
             # Display the frame
             cv2.imshow('Bubble Pop', modified_frame)

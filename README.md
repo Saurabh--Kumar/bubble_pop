@@ -28,7 +28,7 @@ A fun and interactive game where you pop falling bubbles using your hands, power
 2. **Create and activate a virtual environment (recommended)**
    ```bash
    python -m venv venv
-   .\venv\Scripts\activate  # On Windows
+   .\.venv\Scripts\activate  # On Windows
    source venv/bin/activate  # On macOS/Linux
    ```
 

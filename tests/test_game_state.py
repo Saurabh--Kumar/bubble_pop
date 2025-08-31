@@ -68,7 +68,6 @@ class TestGameEngine(unittest.TestCase):
         with patch('events.observers.score_observer.ScoreObserver', create=True) as mock_score_observer_cls, \
              patch('events.observers.health_observer.HealthObserver', create=True) as mock_health_observer_cls, \
              patch('events.observers.sound_observer.SoundObserver', create=True) as mock_sound_observer_cls, \
-             patch('events.observers.spawner_observer.SpawnerObserver', create=True) as mock_spawner_observer_cls, \
              patch('events.observers.freeze_observer.FreezeObserver', create=True) as mock_freeze_observer_cls:
             
             # Create the engine which will register observers
@@ -78,7 +77,6 @@ class TestGameEngine(unittest.TestCase):
             mock_score_observer_cls.assert_called_once_with(engine)
             mock_health_observer_cls.assert_called_once_with(engine)
             mock_sound_observer_cls.assert_called_once()
-            mock_spawner_observer_cls.assert_called_once_with(engine.object_manager)
             mock_freeze_observer_cls.assert_called_once_with(engine)
             
             # Verify event manager registration
@@ -86,7 +84,6 @@ class TestGameEngine(unittest.TestCase):
                 call(EventType.BUBBLE_HIT, mock_score_observer_cls.return_value),
                 call(EventType.BUBBLE_HIT, mock_sound_observer_cls.return_value),
                 call(EventType.BUBBLE_MISSED, mock_health_observer_cls.return_value),
-                call(EventType.BUBBLE_HIT, mock_spawner_observer_cls.return_value),
                 call(EventType.POWER_ACTIVATED, mock_freeze_observer_cls.return_value)
             ]
             self.mock_event_manager.register_observer.assert_has_calls(expected_calls, any_order=True)

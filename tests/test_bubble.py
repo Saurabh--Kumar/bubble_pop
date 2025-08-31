@@ -68,13 +68,10 @@ class TestBubble(unittest.TestCase):
     
     def test_is_off_screen(self):
         """Test off-screen detection."""
-        # Move bubble below screen
-        self.bubble.y = config.WINDOW_HEIGHT + self.radius + 1
-        self.assertTrue(self.bubble.is_off_screen())
-        
-        # Move bubble above screen
-        self.bubble.y = config.WINDOW_HEIGHT - self.radius - 1
-        self.assertFalse(self.bubble.is_off_screen())
+        self.bubble.y = 800  # Off-screen
+        self.assertTrue(self.bubble.is_off_screen(600))
+        self.bubble.y = 300  # On-screen
+        self.assertFalse(self.bubble.is_off_screen(600))
 
 if __name__ == '__main__':
     unittest.main()

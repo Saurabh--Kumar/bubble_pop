@@ -1,101 +1,61 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import Tuple, Optional
+from typing import Tuple
 import numpy as np
-from config.game_config import config
+import cv2
 
 
-class AbstractFallingObject(ABC):
-    """Base class for all falling objects (bubbles, power-ups, etc.)"""
-    
-    def __init__(self, x: float, y: float, radius: float, speed: float, obj_type: str):
-        """
-        Initialize a falling object.
-        
-        Args:
-            x: Initial x position (center)
-            y: Initial y position (center)
-            radius: Radius of the object
-            speed: Falling speed in pixels per second
-            obj_type: Type of object (e.g., 'bubble', 'power')
-        """
+class IGameObject(ABC):
+    """Interface for any object that can be updated and drawn."""
+
+    @abstractmethod
+    def update(self, dt: float) -> None:
+        pass
+
+    @abstractmethod
+    def draw(self, frame: np.ndarray) -> None:
+        pass
+
+
+class AbstractFallingObject(IGameObject, ABC):
+    """Abstract base class for objects that fall from the top of the screen."""
+
+    def __init__(self, x: float, y: float, speed: float, radius: float, obj_type: str):
         self.x = x
         self.y = y
-        self.radius = radius
         self.speed = speed
+        self.radius = radius
         self.type = obj_type
         self.active = True
-    
-    def update(self, dt: float):
-        """
-        Update the object's position.
-        
-        Args:
-            dt: Time delta in seconds since last update
-        """
-        if not self.active:
-            return
-            
-        self.y += self.speed * dt
-    
-    @abstractmethod
-    def draw(self, frame):
-        """
-        Draw the object on the frame.
-        
-        Args:
-            frame: OpenCV frame to draw on
-        """
-        pass
-    
-    def is_hit(self, position: Tuple[float, float]) -> bool:
-        """
-        Check if the object is hit by a position (e.g., fist position).
-        
-        Args:
-            position: (x, y) coordinates to check
-            
-        Returns:
-            bool: True if the position is inside the object's radius
-        """
+        self.frozen = False
+        self.original_speed = speed
+
+    def update(self, dt: float) -> None:
+        if not self.frozen:
+            self.y += self.speed * dt
+        if self.y - self.radius > 720:  # Assuming screen height of 720
+            self.deactivate()
+
+    def draw(self, frame: np.ndarray) -> None:
+        if self.active:
+            center = (int(self.x), int(self.y))
+            cv2.circle(frame, center, int(self.radius), (255, 0, 0), -1)
+
+    def is_hit(self, fist_pos: Tuple[int, int]) -> bool:
         if not self.active:
             return False
-            
-        x, y = position
-        distance = np.sqrt((self.x - x) ** 2 + (self.y - y) ** 2)
+        distance = np.sqrt((self.x - fist_pos[0]) ** 2 + (self.y - fist_pos[1]) ** 2)
         return distance <= self.radius
-    
-    def is_off_screen(self) -> bool:
-        """
-        Check if the object is off the bottom of the screen.
-        
-        Returns:
-            bool: True if the object is off screen
-        """
-        return self.y - self.radius > config.WINDOW_HEIGHT
-    
-    def reset(self, x: Optional[float] = None, y: Optional[float] = None, 
-              radius: Optional[float] = None, speed: Optional[float] = None):
-        """
-        Reset the object's properties for reuse.
-        
-        Args:
-            x: New x position (optional)
-            y: New y position (optional)
-            radius: New radius (optional)
-            speed: New speed (optional)
-        """
-        if x is not None:
-            self.x = x
-        if y is not None:
-            self.y = y
-        if radius is not None:
-            self.radius = radius
-        if speed is not None:
-            self.speed = speed
-            
+
+    def is_off_screen(self, height: int) -> bool:
+        """Check if the object is off the screen."""
+        return self.y > height + self.radius
+
+    def reset(self, **kwargs) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
         self.active = True
-    
-    def deactivate(self):
-        """Mark the object as inactive so it can be reused."""
+        self.frozen = False
+
+    def deactivate(self) -> None:
         self.active = False
