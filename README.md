@@ -2,6 +2,8 @@
 
 A fun and interactive game where you pop falling bubbles using your hands, powered by computer vision. Built with Python, OpenCV, and MediaPipe.
 
+📖 [Architecture Documentation](docs/ARCHITECTURE.md) - Learn about the system design and architecture.
+
 ## 🎮 Features
 
 - Real-time hand tracking using MediaPipe
