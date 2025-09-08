@@ -2,6 +2,8 @@
 
 A fun and interactive game where you pop falling bubbles using your hands, powered by computer vision. Built with Python, OpenCV, and MediaPipe.
 
+📖 [Architecture Documentation](docs/ARCHITECTURE.md) - Learn about the system design and architecture.
+
 ## 🎮 Features
 
 - Real-time hand tracking using MediaPipe
@@ -49,7 +51,7 @@ A fun and interactive game where you pop falling bubbles using your hands, power
    - Collect power-ups:
      - ❄️ `F` - Freeze: Freezes all bubbles temporarily
      - 💥 `D` - Destroy: Removes all bubbles
-     - ❤️ `H` - Heal: Restores your health
+     - ❤️ `H` - Health: Restores your health
    - Press `R` to restart after game over
    - Press `Q` or `ESC` to quit
 
