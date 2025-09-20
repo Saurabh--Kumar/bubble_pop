@@ -15,7 +15,7 @@
 
 ## Overview
 
-Bubble Pop is an interactive game where players pop bubbles using hand gestures. The game features various power-ups, score tracking, and health management. This document outlines the architecture and design decisions behind the implementation.
+Bubble Pop is an interactive game where players pop bubbles using fists. The game features various power-ups, score tracking, and health management. This document outlines the architecture and design decisions behind the implementation.
 
 ## System Architecture
 
@@ -41,7 +41,7 @@ graph TD
 ### 1. GameEngine
 - **Responsibility**: Orchestrates the game loop and manages overall game state
 - **Key Features**:
-  - Manages game state (INIT, RUNNING, PAUSED, GAME_OVER)
+  - Manages game state (INIT, RUNNING, GAME_OVER)
   - Coordinates between different systems
   - Handles game timing and updates
   - Manages score and health
@@ -173,27 +173,8 @@ Game parameters are centralized in `config/game_config.py`:
 1. **Observer Pattern**: Used in the event system
 2. **Component Pattern**: Game objects are composed of components
 3. **Object Pooling**: For efficient object management
-4. **State Pattern**: Game states (INIT, RUNNING, PAUSED, GAME_OVER)
+4. **State Pattern**: Game states (INIT, RUNNING, GAME_OVER)
 5. **Factory Pattern**: Object creation
-
-## Extension Points
-
-1. **New Game Modes**:
-   - Time attack
-   - Endless mode
-   - Challenge modes
-
-2. **New Power-ups**:
-   - Implement new power-up types by extending PowerUp class
-   - Add new event observers for custom behavior
-
-3. **Visual Effects**:
-   - Add new particle effects
-   - Implement shaders for advanced visuals
-
-4. **Multiplayer**:
-   - Add network support for multiplayer
-   - Implement leaderboards
 
 ## Performance Considerations
 
@@ -208,20 +189,3 @@ Game parameters are centralized in `config/game_config.py`:
 - NumPy: Numerical operations
 - Pygame: Audio playback
 - MediaPipe: Hand tracking
-
-## Getting Started
-
-1. Install dependencies: `pip install -r requirements.txt`
-2. Run the game: `python main.py`
-3. Use hand gestures to pop bubbles and collect power-ups
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
