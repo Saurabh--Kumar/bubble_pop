@@ -136,7 +136,6 @@ You can modify game settings in `bubble_pop/config/game_config.py`:
 
 - Make quick, deliberate movements to pop bubbles
 - Try to hit multiple bubbles in one motion
-- Save power-ups for when you really need them
 - Keep an eye on your health!
 
 ## 🐛 Troubleshooting
@@ -153,6 +152,13 @@ You can modify game settings in `bubble_pop/config/game_config.py`:
   - Reduce the game resolution in `game_config.py`
   - Close other resource-intensive applications
 
+## Contributing
+
+  - Fork the repository
+  - Create a feature branch
+  - Make your changes
+  - Submit a pull request
+
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -161,5 +167,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [OpenCV](https://opencv.org/) for computer vision
 - [MediaPipe](https://mediapipe.dev/) for hand tracking
-- [PyGame](https://www.pygame.org/) for audio
-- All contributors and testers
