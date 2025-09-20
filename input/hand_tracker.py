@@ -53,7 +53,7 @@ class HandTracker:
                     height, width = frame.shape[:2]
                     x = int(landmark.x * width)
                     y = int(landmark.y * height)
-                    cv2.circle(frame, (x, y), 3, (0, 255, 0), -1)
+                    #cv2.circle(frame, (x, y), 3, (0, 255, 0), -1)
                 
                 # Get hand landmarks
                 landmarks = hand_landmarks.landmark
@@ -138,27 +138,17 @@ class HandTracker:
         """
         # Get relevant landmarks
         thumb_tip = landmarks[self.mp_hands.HandLandmark.THUMB_TIP]
-        thumb_ip = landmarks[self.mp_hands.HandLandmark.THUMB_IP]
-        thumb_mcp = landmarks[self.mp_hands.HandLandmark.THUMB_CMC]
         
         index_tip = landmarks[self.mp_hands.HandLandmark.INDEX_FINGER_TIP]
-        index_dip = landmarks[self.mp_hands.HandLandmark.INDEX_FINGER_DIP]
-        index_pip = landmarks[self.mp_hands.HandLandmark.INDEX_FINGER_PIP]
         index_mcp = landmarks[self.mp_hands.HandLandmark.INDEX_FINGER_MCP]
         
         middle_tip = landmarks[self.mp_hands.HandLandmark.MIDDLE_FINGER_TIP]
-        middle_dip = landmarks[self.mp_hands.HandLandmark.MIDDLE_FINGER_DIP]
-        middle_pip = landmarks[self.mp_hands.HandLandmark.MIDDLE_FINGER_PIP]
         middle_mcp = landmarks[self.mp_hands.HandLandmark.MIDDLE_FINGER_MCP]
         
         ring_tip = landmarks[self.mp_hands.HandLandmark.RING_FINGER_TIP]
-        ring_dip = landmarks[self.mp_hands.HandLandmark.RING_FINGER_DIP]
-        ring_pip = landmarks[self.mp_hands.HandLandmark.RING_FINGER_PIP]
         ring_mcp = landmarks[self.mp_hands.HandLandmark.RING_FINGER_MCP]
         
         pinky_tip = landmarks[self.mp_hands.HandLandmark.PINKY_TIP]
-        pinky_dip = landmarks[self.mp_hands.HandLandmark.PINKY_DIP]
-        pinky_pip = landmarks[self.mp_hands.HandLandmark.PINKY_PIP]
         pinky_mcp = landmarks[self.mp_hands.HandLandmark.PINKY_MCP]
         
         wrist = landmarks[self.mp_hands.HandLandmark.WRIST]

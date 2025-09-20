@@ -176,7 +176,6 @@ Game parameters are centralized in `config/game_config.py`:
 4. **State Pattern**: Game states (INIT, RUNNING, GAME_OVER)
 5. **Factory Pattern**: Object creation
 
-
 ## Performance Considerations
 
 1. **Object Pooling**: Reuses objects to minimize garbage collection

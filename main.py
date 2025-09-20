@@ -65,32 +65,34 @@ def main():
                 
             # Check for game over
             if game_engine.state == GameState.GAME_OVER:
-                # Show game over screen for 3 seconds
-                cv2.waitKey(3000)
+                # Get the frame with game over overlay and text
+                modified_frame = game_engine._draw_game_over(modified_frame)
                 
-                # Ask for restart
-                modified_frame = cv2.putText(
-                    modified_frame,
-                    "Press 'R' to restart or 'Q' to quit", 
-                    (config.WINDOW_WIDTH // 2 - 200, config.WINDOW_HEIGHT // 2 + 50),
-                    cv2.FONT_HERSHEY_SIMPLEX, 
-                    0.8, 
-                    (255, 255, 255), 
-                    2, 
-                    cv2.LINE_AA
-                )
+                # Add restart/quit instructions with shadow for better visibility
+                instruction_text = "Press 'R' to restart or 'Q' to quit"
+                instruction_pos = (config.WINDOW_WIDTH // 2 - 200, config.WINDOW_HEIGHT // 2 + 100)
+                
+                # Draw shadow
+                cv2.putText(modified_frame, instruction_text, 
+                           (instruction_pos[0] + 1, instruction_pos[1] + 1),
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 3, cv2.LINE_AA)
+                # Draw main text
+                cv2.putText(modified_frame, instruction_text, 
+                           instruction_pos,
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.8, 
+                           (255, 255, 255), 2, cv2.LINE_AA)
+                
+                # Display the updated frame with game over and instructions
                 cv2.imshow('Bubble Pop', modified_frame)
                 
-                # Wait for restart or quit
-                while True:
-                    key = cv2.waitKey(100) & 0xFF
-                    if key == ord('r') or key == ord('R'):
-                        game_engine.reset()
-                        last_time = time.time()
-                        break
-                    elif key == ord('q') or key == 27:  # 'q' or ESC
-                        running = False
-                        break
+                # Check for restart/quit keys
+                key = cv2.waitKey(1) & 0xFF
+                if key == ord('r') or key == ord('R'):
+                    game_engine.reset()
+                    last_time = time.time()
+                elif key == ord('q') or key == 27:  # 'q' or ESC
+                    running = False
+                continue  # Skip the rest of the loop to prevent overwriting
     
     except KeyboardInterrupt:
         print("Game stopped by user.")
