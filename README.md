@@ -4,6 +4,10 @@ A fun and interactive game where you pop falling bubbles using your hands, power
 
 📖 [Architecture Documentation](docs/ARCHITECTURE.md) - Learn about the system design and architecture.
 
+## 🎥 Demo
+
+[![Bubble Pop Game Demo](https://img.youtube.com/vi/5DHjTL0dg2Y/0.jpg)](https://www.youtube.com/watch?v=5DHjTL0dg2Y)
+
 ## 🎮 Features
 
 - Real-time hand tracking using MediaPipe
